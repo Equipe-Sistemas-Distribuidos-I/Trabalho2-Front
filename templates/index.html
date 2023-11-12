@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Seu Projeto</title>
+    <title>Distribuídos Front-End</title>
     <style>
       body {
         font-family: "Arial", sans-serif;
@@ -69,12 +69,15 @@
         <option value="presenca">Presença</option>
       </select>
 
-      <div id="valorInputContainer">
-        <!-- Este contêiner será preenchido dinamicamente com o input correspondente ao tipo selecionado -->
-      </div>
+      <div id="valorInputContainer"></div>
 
       <button type="button" onclick="submitForm()">Enviar</button>
     </form>
+
+    <div id="resultContainer" style="margin-top: 20px">
+      <h2>Resultados:</h2>
+      <p id="resultMessage"></p>
+    </div>
 
     <script>
       function updateInputType() {
@@ -83,10 +86,8 @@
           "valorInputContainer"
         );
 
-        // Limpar qualquer input existente
         valorInputContainer.innerHTML = "";
 
-        // Adicionar input correspondente ao tipo selecionado
         if (tipo === "luminosidade" || tipo === "temperatura") {
           var inputElement = document.createElement("input");
           inputElement.type = "number";
@@ -113,7 +114,6 @@
           valor = document.querySelector("#valorInputContainer input").value;
         }
 
-        // Enviar os dados para o endpoint Flask
         fetch("/api/data", {
           method: "POST",
           headers: {
@@ -123,15 +123,16 @@
         })
           .then((response) => response.json())
           .then((data) => {
-            // Tratar a resposta, se necessário
-            console.log(data);
+            var resultMessage = document.getElementById("resultMessage");
+            resultMessage.innerHTML =
+              data.message + " " + data.object.tipo + " " + data.object.valor;
+            document.querySelector("#valorInputContainer input").value = "";
           })
           .catch((error) => {
             console.error("Erro ao enviar dados:", error);
           });
       }
 
-      // Chamar updateInputType() para garantir que o input seja inicializado corretamente
       updateInputType();
     </script>
   </body>
