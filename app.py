@@ -1,4 +1,5 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_from_directory
+import os
 
 app = Flask(__name__)
 
@@ -27,6 +28,11 @@ def api_data():
                 })
         else:
             return jsonify({'error': 'Parâmetros ausentes ou inválidos.'}), 400
+
+@app.route('/public/<path:filename>')
+def serve_static(filename):
+    root_dir = os.path.dirname(os.path.abspath(__file__))
+    return send_from_directory(os.path.join(root_dir, 'public'), filename)
 
 if __name__ == '__main__':
     app.run(debug=True, port=5555)
