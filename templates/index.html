@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Seu Projeto</title>
+    <style>
+      body {
+        font-family: "Arial", sans-serif;
+        background-color: #f5f5f5;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+      }
+
+      h1 {
+        color: #333;
+      }
+
+      form {
+        background-color: #fff;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: bold;
+      }
+
+      select,
+      input[type="number"],
+      input[type="checkbox"] {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 16px;
+        box-sizing: border-box;
+      }
+
+      button {
+        background-color: #4caf50;
+        color: #fff;
+        padding: 10px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 16px;
+      }
+
+      button:hover {
+        background-color: #45a049;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Bem-vindo ao seu projeto Flask</h1>
+
+    <form id="dataForm">
+      <label for="tipo">Tipo:</label>
+      <select id="tipo" name="tipo" onchange="updateInputType()">
+        <option value="luminosidade">Luminosidade</option>
+        <option value="temperatura">Temperatura</option>
+        <option value="presenca">Presença</option>
+      </select>
+
+      <div id="valorInputContainer">
+        <!-- Este contêiner será preenchido dinamicamente com o input correspondente ao tipo selecionado -->
+      </div>
+
+      <button type="button" onclick="submitForm()">Enviar</button>
+    </form>
+
+    <script>
+      function updateInputType() {
+        var tipo = document.getElementById("tipo").value;
+        var valorInputContainer = document.getElementById(
+          "valorInputContainer"
+        );
+
+        // Limpar qualquer input existente
+        valorInputContainer.innerHTML = "";
+
+        // Adicionar input correspondente ao tipo selecionado
+        if (tipo === "luminosidade" || tipo === "temperatura") {
+          var inputElement = document.createElement("input");
+          inputElement.type = "number";
+          inputElement.name = "valor";
+          inputElement.required = true;
+          valorInputContainer.appendChild(inputElement);
+        } else if (tipo === "presenca") {
+          var checkboxElement = document.createElement("input");
+          checkboxElement.type = "checkbox";
+          checkboxElement.name = "valor";
+          valorInputContainer.appendChild(checkboxElement);
+        }
+      }
+
+      function submitForm() {
+        var tipo = document.getElementById("tipo").value;
+        var valor;
+
+        if (tipo === "presenca") {
+          valor = document.querySelector(
+            '#valorInputContainer input[type="checkbox"]'
+          ).checked;
+        } else {
+          valor = document.querySelector("#valorInputContainer input").value;
+        }
+
+        // Enviar os dados para o endpoint Flask
+        fetch("/api/data", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ tipo: tipo, valor: valor }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            // Tratar a resposta, se necessário
+            console.log(data);
+          })
+          .catch((error) => {
+            console.error("Erro ao enviar dados:", error);
+          });
+      }
+
+      // Chamar updateInputType() para garantir que o input seja inicializado corretamente
+      updateInputType();
+    </script>
+  </body>
+</html>
